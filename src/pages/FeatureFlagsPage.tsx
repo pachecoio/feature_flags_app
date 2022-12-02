@@ -1,11 +1,13 @@
 import Container from "../components/container/Container";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import styled from "styled-components";
 import Datagrid, {Cell} from "../components/datagrid/Datagrid";
 import {Breadcrumbs, Fab, TableRow, Typography} from "@mui/material";
 import FeatureFlag from "../models/FeatureFlag";
 import {Link, useNavigate} from "react-router-dom";
 import {Add} from "@mui/icons-material";
+import {useQuery} from "react-query";
+import {queryClient} from "../main";
 
 const initialFlags: FeatureFlag[] = [
   new FeatureFlag(
@@ -31,14 +33,18 @@ const FlagListItem = styled.li`
 `
 
 export default function FeatureFlagsPage() {
-  const [flags, setFlags] = useState<FeatureFlag[]>([...initialFlags])
   const navigate = useNavigate();
+  const { isLoading, error, data } = useQuery('flagsData', () =>
+      fetch('http://localhost:8080/feature_flags').then(res => res.json())
+  )
+
+  useEffect(() => {
+    return () => {
+      queryClient.invalidateQueries("flagsData")
+    }
+  }, [])
 
   const columns = [
-    {
-      label: "ID",
-      value: "id"
-    },
     {
       label: "Name",
       value: "name"
@@ -71,6 +77,19 @@ export default function FeatureFlagsPage() {
     )
   }
 
+  if (isLoading) return (
+    <Container>
+      <Typography>Loading...</Typography>
+    </Container>
+  )
+
+  if (error) return (
+    <Container>
+      {/*@ts-ignore*/}
+      <Typography>Error: {error.message}</Typography>
+    </Container>
+  )
+
   return (
     <>
     <Container>
@@ -80,11 +99,13 @@ export default function FeatureFlagsPage() {
       <div className="content">
         <Datagrid columns={columns}>
           <>
-            {flags.map((flag, index) => (
+            {
+              // @ts-ignore
+              data.items.map((flag, index) => (
             <TableRow key={index}>
               {columns.map((column) => (
                 <Cell key={column.value} align="left">
-                  <Link to={`/${flag.id}`}>
+                  <Link to={`/${flag._id.$oid}`}>
                     {
                       // @ts-ignore
                       CellText(flag[column.value])

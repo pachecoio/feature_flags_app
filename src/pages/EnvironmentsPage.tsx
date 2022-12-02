@@ -11,8 +11,23 @@ const initialEnvs = [
     name: "staging",
   }
 ]
-export default function Environments() {
+export default function EnvironmentsPage() {
   const [envs] = useState([...initialEnvs]);
+
+  const columns = [
+    {
+      label: "Name",
+      value: "name"
+    },
+    {
+      label: "Created at",
+      value: "created_at"
+    },
+    {
+      label: "Last updated at",
+      value: "updated_at"
+    },
+  ]
 
   return (
     <>

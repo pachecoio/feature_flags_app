@@ -5,24 +5,60 @@ import {
   Link,
   Typography
 } from "@mui/material";
-import {useState} from "react";
 import FeatureFlag from "../models/FeatureFlag";
 import {Card} from "../components/Card";
 import {FeatureFlagForm} from "../components/forms/FeatureFlagForm";
+import {useMutation, useQuery} from "react-query";
+import {useNavigate, useParams} from "react-router-dom";
+import {useEffect} from "react";
+import {queryClient} from "../main";
+import {getFlag, updateFlag} from "../services/feature_flags_api";
+
 
 export default function FeatureFlagPage() {
-  const [flag, setFlag] = useState<FeatureFlag>(
-    new FeatureFlag(
-      "",
-      "sample_flag",
-      "Sample Flag",
-      false
-    )
-  );
+  let { id } = useParams();
+  // @ts-ignore
+  const { isLoading, error, data } = useQuery('fetch_flag', () => getFlag(id))
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    return () => {
+      queryClient.invalidateQueries("fetch_flag")
+    }
+  }, [])
+
+  const mutation = useMutation(updateFlag, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('fetch_flag')
+      queryClient.invalidateQueries('flagsData')
+      navigate("/");
+    },
+  })
 
   function handleSave(featureFlag: FeatureFlag) {
-    console.log('save flag', featureFlag)
+    console.log('update flag', featureFlag)
+    // Include expected oid for Be
+    // @ts-ignore
+    featureFlag._id = {
+      $oid: id
+    }
+    mutation.mutate(featureFlag)
   }
+
+  if (isLoading) return (
+    <Container>
+      <Typography>Loading...</Typography>
+    </Container>
+  )
+
+  if (error) return (
+    <Container>
+      {/*@ts-ignore*/}
+      <Typography>Error: {error.message}</Typography>
+    </Container>
+  )
+
+  console.log('current flag', data)
 
   return (
     <Container style={{marginTop: "1.5em", marginBottom: "1.5em"}}>
@@ -30,18 +66,18 @@ export default function FeatureFlagPage() {
         <Link underline="hover" color="inherit" href="/">
           Feature Flags
         </Link>
-        <Typography color="text.primary">{!!flag.name ? flag.name : "Add flag"}</Typography>
+        <Typography color="text.primary">{!!data.name ? data.name : "Add flag"}</Typography>
       </Breadcrumbs>
       <Card>
         <Typography variant="h6" sx={{
           mb: 1
         }}>
-          {!!flag.name ? "Edit feature flag " + flag.name : "Add feature flag"}
+          {!!data.name ? "Edit feature flag " + data.name : "Add feature flag"}
         </Typography>
         <Divider sx={{
           mb: 4
         }} />
-        <FeatureFlagForm featureFlag={flag} onSave={handleSave} />
+        <FeatureFlagForm featureFlag={data} onSave={handleSave} />
       </Card>
     </Container>
   )

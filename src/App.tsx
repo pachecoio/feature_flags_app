@@ -1,7 +1,7 @@
 import Layout from "./layout/Layout";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import FeatureFlagsPage from "./pages/FeatureFlagsPage";
-import Environments from "./pages/Environments";
+import EnvironmentsPage from "./pages/EnvironmentsPage";
 import FeatureFlagPage from "./pages/FeatureFlagPage";
 import {createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 import AddFeatureFlagPage from "./pages/AddFeatureFlagPage";
@@ -22,7 +22,7 @@ function App() {
             <Route path={"/"} element={<FeatureFlagsPage />} />
             <Route path={"/:id"} element={<FeatureFlagPage />} />
             <Route path={"/add"} element={<AddFeatureFlagPage />} />
-            <Route path={"/environments"} element={<Environments />} />
+            <Route path={"/environments"} element={<EnvironmentsPage />} />
           </Routes>
         </Layout>
       </BrowserRouter>
