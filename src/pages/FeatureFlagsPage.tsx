@@ -2,9 +2,10 @@ import Container from "../components/container/Container";
 import {useState} from "react";
 import styled from "styled-components";
 import Datagrid, {Cell} from "../components/datagrid/Datagrid";
-import {Breadcrumbs, TableRow, Typography} from "@mui/material";
+import {Breadcrumbs, Fab, TableRow, Typography} from "@mui/material";
 import FeatureFlag from "../models/FeatureFlag";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
+import {Add} from "@mui/icons-material";
 
 const initialFlags: FeatureFlag[] = [
   new FeatureFlag(
@@ -31,6 +32,7 @@ const FlagListItem = styled.li`
 
 export default function FeatureFlagsPage() {
   const [flags, setFlags] = useState<FeatureFlag[]>([...initialFlags])
+  const navigate = useNavigate();
 
   const columns = [
     {
@@ -55,6 +57,10 @@ export default function FeatureFlagsPage() {
     },
   ]
 
+  function addFlag() {
+    navigate("/add")
+  }
+
   function CellText(value: any) {
     let v = value;
     if (value instanceof Date) {
@@ -66,6 +72,7 @@ export default function FeatureFlagsPage() {
   }
 
   return (
+    <>
     <Container>
       <Breadcrumbs aria-label="breadcrumb" sx={{mt: 2.5, mb: 2, ml: 1}}>
         <Typography color="text.primary">Feature Flags</Typography>
@@ -91,5 +98,13 @@ export default function FeatureFlagsPage() {
         </Datagrid>
       </div>
     </Container>
+      <Fab sx={{
+        position: "fixed",
+        bottom: 50,
+        right: 50,
+      }} color="primary" aria-label="add" onClick={addFlag}>
+        <Add />
+      </Fab>
+    </>
   )
 }
