@@ -1,25 +1,26 @@
 import {Breadcrumbs, Divider, Link, Typography} from "@mui/material";
 import Container from "../components/container/Container";
-import FeatureFlag from "../models/FeatureFlag";
 import {Card} from "../components/Card";
 import {FeatureFlagForm} from "../components/forms/FeatureFlagForm";
 import {useMutation} from "react-query";
 import {queryClient} from "../main";
 import {useNavigate} from "react-router-dom";
-import {createFlag} from "../services/feature_flags_api";
+import {createEnvironment} from "../services/environments_api";
+import Environment from "../models/Environment";
+import {EnvironmentForm} from "../components/forms/EnvironmentForm";
 
-export default function AddFeatureFlagPage() {
+export default function AddEnvironmentPage() {
   const navigate = useNavigate();
 
-  const mutation = useMutation(createFlag, {
+  const mutation = useMutation(createEnvironment, {
     onSuccess: () => {
-      queryClient.invalidateQueries('flagsData')
+      queryClient.invalidateQueries('environmentsData')
       navigate("/");
     },
   })
 
-  function handleSave(featureFlag: FeatureFlag) {
-    mutation.mutate(featureFlag)
+  function handleSave(env: Environment) {
+    mutation.mutate(env)
   }
 
   return (
@@ -27,21 +28,22 @@ export default function AddFeatureFlagPage() {
       <Container style={{marginTop: "1.5em", marginBottom: "1.5em"}}>
         <Breadcrumbs aria-label="breadcrumb" sx={{mt: 2.5, mb: 2, ml: 1}}>
           <Link underline="hover" color="inherit" href="/">
-            Feature Flags
+            Environments
           </Link>
-          <Typography color="text.primary">{"Add flag"}</Typography>
+          <Typography color="text.primary">{"Add environment"}</Typography>
         </Breadcrumbs>
         <Card>
           <Typography variant="h6" sx={{
             mb: 1
           }}>
-            Add feature flag
+            Add Environment
           </Typography>
           <Divider sx={{
             mb: 4
           }} />
-          <FeatureFlagForm onSave={handleSave} />
+          <EnvironmentForm onSave={handleSave} />
         </Card>
+
       </Container>
     </>
   )

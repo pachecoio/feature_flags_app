@@ -5,6 +5,7 @@ import EnvironmentsPage from "./pages/EnvironmentsPage";
 import FeatureFlagPage from "./pages/FeatureFlagPage";
 import {createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 import AddFeatureFlagPage from "./pages/AddFeatureFlagPage";
+import AddEnvironmentPage from "./pages/AddEnvironment";
 
 const darkTheme = createTheme({
   palette: {
@@ -23,6 +24,7 @@ function App() {
             <Route path={"/:id"} element={<FeatureFlagPage />} />
             <Route path={"/add"} element={<AddFeatureFlagPage />} />
             <Route path={"/environments"} element={<EnvironmentsPage />} />
+            <Route path={"/environments/add"} element={<AddEnvironmentPage />} />
           </Routes>
         </Layout>
       </BrowserRouter>
