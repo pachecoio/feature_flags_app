@@ -2,15 +2,14 @@ import Container from "../components/container/Container";
 import {
   Backdrop,
   Breadcrumbs, Button, CircularProgress,
-  Divider,
-  Link,
+  Divider, FormControl,
   Typography
 } from "@mui/material";
 import FeatureFlag from "../models/FeatureFlag";
 import {Card} from "../components/Card";
 import {FeatureFlagForm} from "../components/forms/FeatureFlagForm";
 import {useMutation, useQuery} from "react-query";
-import {useNavigate, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {useContext, useEffect} from "react";
 import {queryClient} from "../main";
 import {deleteFlag, getFlag, updateFlag} from "../services/feature_flags_api";
@@ -83,20 +82,18 @@ export default function FeatureFlagPage() {
   return (
     <Container style={{marginTop: "1.5em", marginBottom: "1.5em"}}>
       <Breadcrumbs aria-label="breadcrumb" sx={{mb: 2, ml: 1}}>
-        <Link underline="hover" color="inherit" href="/">
+        <Link color="inherit" to="/">
           Feature Flags
         </Link>
         <Typography color="text.primary">{!!data.name ? data.name : "Add flag"}</Typography>
       </Breadcrumbs>
       <Card>
-        <div>
-          <Typography variant="h6" sx={{
-            mb: 1
-          }}>
-            {!!data.name ? "Edit feature flag " + data.name : "Add feature flag"}
-          </Typography>
-          <Button variant="outlined" color="error" onClick={handleDelete}>Delete</Button>
-        </div>
+          <FormControl sx={{display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', mb: 1}}>
+            <Typography variant="h6">
+              {!!data.name ? "Edit feature flag " + data.name : "Add feature flag"}
+            </Typography>
+            <Button variant="outlined" color="error" onClick={handleDelete}>Delete</Button>
+          </FormControl>
         <Divider sx={{
           mb: 4
         }} />

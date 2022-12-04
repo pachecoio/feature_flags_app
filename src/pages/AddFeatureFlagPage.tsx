@@ -1,11 +1,11 @@
-import {Breadcrumbs, Divider, Link, Typography} from "@mui/material";
+import {Breadcrumbs, Divider, Typography} from "@mui/material";
 import Container from "../components/container/Container";
 import FeatureFlag from "../models/FeatureFlag";
 import {Card} from "../components/Card";
 import {FeatureFlagForm} from "../components/forms/FeatureFlagForm";
 import {useMutation} from "react-query";
 import {queryClient} from "../main";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {createFlag} from "../services/feature_flags_api";
 import {useContext} from "react";
 import {AlertContextType} from "../@types/alert";
@@ -36,7 +36,7 @@ export default function AddFeatureFlagPage() {
     <>
       <Container style={{marginTop: "1.5em", marginBottom: "1.5em"}}>
         <Breadcrumbs aria-label="breadcrumb" sx={{mt: 2.5, mb: 2, ml: 1}}>
-          <Link underline="hover" color="inherit" href="/">
+          <Link color="inherit" to="/">
             Feature Flags
           </Link>
           <Typography color="text.primary">{"Add flag"}</Typography>

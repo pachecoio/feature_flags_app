@@ -36,7 +36,7 @@ export default function Sidebar() {
               <ListItemIcon>
                 <Pages />
               </ListItemIcon>
-              <ListItemText primary="EnvironmentsPage" />
+              <ListItemText primary="Environments" />
             </ListItemButton>
           </ListItem>
         </List>

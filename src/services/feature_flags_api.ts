@@ -38,3 +38,5 @@ export const deleteFlag = async (id: string) => {
   })
   return res.json()
 }
+
+export const getFlags = () => fetch('http://localhost:8080/feature_flags').then(res => res.json())

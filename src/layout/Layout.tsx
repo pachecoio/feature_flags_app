@@ -1,8 +1,10 @@
 import styled from "styled-components";
-import React from "react";
+import React, {useContext} from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import Sidebar from "./Sidebar";
+import {Alert, AlertTitle} from "@mui/material";
+import {AlertContext} from "../AlertProvider";
 
 const Main = styled.main`
   display: flex;
@@ -25,6 +27,8 @@ type Props = {
 }
 
 export default function Layout({children}: Props) {
+  const {alert} = useContext(AlertContext);
+
   return (
     <LayoutWrapper>
       <Header />
@@ -32,6 +36,20 @@ export default function Layout({children}: Props) {
       <Main>
         {children}
       </Main>
+      {
+        alert ?
+        <Alert
+          severity={alert.severity}
+          sx={{
+            position: "absolute",
+            top: 50,
+            right: 20,
+          }}
+        >
+          <AlertTitle>{alert.title}</AlertTitle>
+          {alert.message}
+        </Alert> : null
+      }
       <Footer />
     </LayoutWrapper>
   )

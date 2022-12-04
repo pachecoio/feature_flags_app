@@ -9,7 +9,6 @@ import {useQuery} from "react-query";
 import {queryClient} from "../main";
 
 export default function EnvironmentsPage() {
-  const [envs, setEnvs] = useState<Environment[]>([]);
   const navigate = useNavigate();
 
   const columns = [
@@ -33,6 +32,16 @@ export default function EnvironmentsPage() {
     navigate("/environments/add")
   }
 
+  function CellText(value: any) {
+    let v = value;
+    if (value instanceof Date) {
+      v = value.toLocaleString()
+    }
+    return (
+      <Typography>{v}</Typography>
+    )
+  }
+
   if (isLoading) return <Container>
     <Typography>Loading...</Typography>
   </Container>
@@ -46,27 +55,28 @@ export default function EnvironmentsPage() {
     <div>
     <Container>
       <Breadcrumbs aria-label="breadcrumb" sx={{mt: 2.5, mb: 2, ml: 1}}>
-        <Typography color="text.primary">Feature Flags</Typography>
+        <Typography color="text.primary">Environments</Typography>
       </Breadcrumbs>
       <div className="content">
         <Datagrid columns={columns}>
           <>
             {
               // @ts-ignore
-              data.items.map((flag, index) => (
-            <TableRow key={index}>
-              {columns.map((column) => (
-                <Cell key={column.value} align="left">
-                  <Link to={`/${flag._id.$oid}`}>
-                    {
-                      // @ts-ignore
-                      CellText(flag[column.value])
-                    }
-                  </Link>
-                </Cell>
-              ))}
-            </TableRow>
-          ))}
+              data.items.map((env, index) => (
+                <TableRow key={index}>
+                  {columns.map((column) => (
+                    <Cell key={column.value} align="left">
+                      <Link to={`/environments/${env._id.$oid}`}>
+                        {
+                          // @ts-ignore
+                          CellText(env[column.value])
+                        }
+                      </Link>
+                    </Cell>
+                  ))}
+                </TableRow>
+              ))
+            }
           </>
         </Datagrid>
       </div>

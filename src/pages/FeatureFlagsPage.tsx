@@ -1,22 +1,16 @@
 import Container from "../components/container/Container";
-import {useContext, useEffect, useState} from "react";
-import styled from "styled-components";
-import Datagrid, {Cell} from "../components/datagrid/Datagrid";
-import {Alert, AlertTitle, Backdrop, Breadcrumbs, CircularProgress, Fab, TableRow, Typography} from "@mui/material";
-import FeatureFlag from "../models/FeatureFlag";
-import {Link, useNavigate} from "react-router-dom";
+import {useEffect} from "react";
+import {Backdrop, Breadcrumbs, CircularProgress, Fab, Typography} from "@mui/material";
+import {useNavigate} from "react-router-dom";
 import {Add} from "@mui/icons-material";
 import {useQuery} from "react-query";
 import {queryClient} from "../main";
-import {AlertContext} from "../AlertProvider";
+import FeatureFlagsDatagrid from "../components/datagrid/FeatureFlagsDatagrid";
+import {getFlags} from "../services/feature_flags_api";
 
 export default function FeatureFlagsPage() {
   const navigate = useNavigate();
-  const { isLoading, error, data } = useQuery('flagsData', () =>
-      fetch('http://localhost:8080/feature_flags').then(res => res.json())
-  )
-  // @ts-ignore
-  const {alert} = useContext(AlertContext);
+  const { isLoading, error, data } = useQuery('flagsData', getFlags)
 
   useEffect(() => {
     return () => {
@@ -24,38 +18,10 @@ export default function FeatureFlagsPage() {
     }
   }, [])
 
-  const columns = [
-    {
-      label: "Name",
-      value: "name"
-    },
-    {
-      label: "Label",
-      value: "label"
-    },
-    {
-      label: "Created at",
-      value: "created_at"
-    },
-    {
-      label: "Last updated at",
-      value: "updated_at"
-    },
-  ]
-
   function addFlag() {
     navigate("/add")
   }
 
-  function CellText(value: any) {
-    let v = value;
-    if (value instanceof Date) {
-      v = value.toLocaleString()
-    }
-    return (
-      <Typography>{v}</Typography>
-    )
-  }
 
   if (isLoading) return (
     <Backdrop
@@ -73,8 +39,6 @@ export default function FeatureFlagsPage() {
     </Container>
   )
 
-  console.log('alert', alert)
-
   return (
     <>
     <Container>
@@ -82,26 +46,7 @@ export default function FeatureFlagsPage() {
         <Typography color="text.primary">Feature Flags</Typography>
       </Breadcrumbs>
       <div className="content">
-        <Datagrid columns={columns}>
-          <>
-            {
-              // @ts-ignore
-              data.items.map((flag, index) => (
-            <TableRow key={index}>
-              {columns.map((column) => (
-                <Cell key={column.value} align="left">
-                  <Link to={`/${flag._id.$oid}`}>
-                    {
-                      // @ts-ignore
-                      CellText(flag[column.value])
-                    }
-                  </Link>
-                </Cell>
-              ))}
-            </TableRow>
-          ))}
-          </>
-        </Datagrid>
+        <FeatureFlagsDatagrid flags={data.items} />
       </div>
     </Container>
       <Fab sx={{
@@ -111,20 +56,6 @@ export default function FeatureFlagsPage() {
       }} color="primary" aria-label="add" onClick={addFlag}>
         <Add />
       </Fab>
-      {
-        alert ?
-        <Alert
-          severity={alert.severity}
-          sx={{
-            position: "absolute",
-            top: 50,
-            right: 20,
-          }}
-        >
-          <AlertTitle>{alert.title}</AlertTitle>
-          {alert.message}
-        </Alert> : null
-      }
     </>
   )
 }

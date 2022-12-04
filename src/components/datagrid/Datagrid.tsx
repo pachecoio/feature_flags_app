@@ -1,4 +1,15 @@
-import {Box, Paper, styled, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import {
+  Box,
+  Paper,
+  styled,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
+} from "@mui/material";
 
 export const Cell = styled(TableCell)`
   color: #f9f9f9;
@@ -48,4 +59,15 @@ export default function Datagrid({columns, children}: Props) {
       </Paper>
         </Box>
   )
+}
+
+
+export function CellText(value: any) {
+    let v = value;
+    if (value instanceof Date) {
+      v = value.toLocaleString()
+    }
+    return (
+      <Typography>{v}</Typography>
+    )
 }

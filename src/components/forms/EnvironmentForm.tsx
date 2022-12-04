@@ -23,20 +23,14 @@ type EnvironmentFormProps = {
 }
 
 export function EnvironmentForm({environment, onSave}: EnvironmentFormProps) {
-  const [env, setEnv] = useState<Environment | null>(environment ?? null);
   const [name, setName] = useState<string>("");
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (env) {
+    if (environment) {
       setIsEdit(true);
-      setName(env.name);
-    } else {
-      setEnv(new Environment(
-        "",
-        []
-      ));
+      setName(environment.name);
     }
   }, [])
 
@@ -55,15 +49,9 @@ export function EnvironmentForm({environment, onSave}: EnvironmentFormProps) {
     navigate(-1)
   }
 
-  if (!env) return (
-    <Container>
-      Loading
-    </Container>
-  )
-
   return (
     <>
-        <Box sx={{display: 'flex'}}>
+        <Box sx={{display: 'flex', flexDirection: 'column'}}>
           <FormControl sx={{ mb: 1, mr: 1, flex: 1 }}>
             <TextField
               label={"Name"}
@@ -72,14 +60,18 @@ export function EnvironmentForm({environment, onSave}: EnvironmentFormProps) {
               disabled={isEdit}
             />
           </FormControl>
-          <FormControl sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'flex-end',
-          }}>
-            <Button sx={{margin: '1em'}} variant="outlined" onClick={handleCancel}>Cancel</Button>
-            <Button sx={{margin: '1em'}} variant="contained" onClick={handleSave}>Save</Button>
-          </FormControl>
+          {
+            !isEdit ? (
+              <FormControl sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+              }}>
+                <Button sx={{margin: '1em'}} variant="outlined" onClick={handleCancel}>Cancel</Button>
+                <Button sx={{margin: '1em'}} variant="contained" onClick={handleSave}>Save</Button>
+              </FormControl>
+            ) : null
+          }
         </Box>
       </>
   )
