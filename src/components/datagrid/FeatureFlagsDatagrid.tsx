@@ -23,6 +23,10 @@ export default function FeatureFlagsDatagrid({flags}: FeatureFlagsDatagridProps)
       value: "created_at"
     },
     {
+      label: "Enabled",
+      value: "enabled"
+    },
+    {
       label: "Last updated at",
       value: "updated_at"
     },

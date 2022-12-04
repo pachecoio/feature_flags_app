@@ -3,7 +3,7 @@ import {
   Breadcrumbs,
   CircularProgress,
   Divider,
-  FormControl, MenuItem,
+  FormControl, IconButton, MenuItem,
   Select,
   Typography
 } from "@mui/material";
@@ -19,6 +19,7 @@ import {AlertContextType} from "../@types/alert";
 import {AlertContext} from "../AlertProvider";
 import {getEnvironment, setEnvironmentFlag} from "../services/environments_api";
 import {getFlags} from "../services/feature_flags_api";
+import {AddBox, AddCard, AddCircle} from "@mui/icons-material";
 
 export default function AddEnvironmentFeatureFlagPage() {
   const {id} = useParams();
@@ -46,6 +47,7 @@ export default function AddEnvironmentFeatureFlagPage() {
     if (id) { // @ts-ignore
       mutation.mutate({
         envId: id,
+        // @ts-ignore
         flag: {
           name: featureFlag.name,
           label: featureFlag.label,
@@ -82,25 +84,48 @@ export default function AddEnvironmentFeatureFlagPage() {
           </Link>
           <Typography color="text.primary">{"Add flag"}</Typography>
         </Breadcrumbs>
-        <Card sx={{mb: 2}}>
-          <FormControl>
-            <Typography>
-              Select a feature flag
-            </Typography>
-            <Select
-              id="flag"
-              value={flag || ""}
-              label="Age"
-              onChange={(e) => {
-                setFlag(e.target.value)
-              }}
-            >
-              {flagsData.data.items.map((flag: FeatureFlag) => (
-                <MenuItem key={flag._id.$oid} value={flag}>{flag.name}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Card>
+        {
+          flagsData.data.items.length ? (
+            <Card sx={{mb: 2}}>
+              <FormControl>
+                <Typography>
+                  Select a feature flag
+                </Typography>
+              </FormControl>
+              <FormControl fullWidth sx={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                <Select
+                  id="flag"
+                  value={flag || ""}
+                  label="Age"
+                  onChange={(e) => {
+                    // @ts-ignore
+                    setFlag(e.target.value)
+                  }}
+                  sx={{flex: 1, mr: 2}}
+                >
+                  {flagsData.data.items.map((flag: FeatureFlag) => (
+                    // @ts-ignore
+                    <MenuItem key={flag._id.$oid} value={flag}>{flag.name}</MenuItem>
+                  ))}
+                </Select>
+                <IconButton onClick={() => {
+                  navigate(`/add`)
+                }}>
+                  <AddCircle />
+                </IconButton>
+              </FormControl>
+            </Card>
+          ): (
+            <Card sx={{mb: 2, display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
+              <Typography>No flags available</Typography>
+              <Typography>
+                Visit the feature flags page and create a new flag to proceed
+              </Typography>
+              <Link to="/add">Create a new flag</Link>
+            </Card>
+          )
+        }
+
         {
           flag ? (
             <Card>

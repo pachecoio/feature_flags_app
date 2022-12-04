@@ -1,23 +1,60 @@
-import {Backdrop, Breadcrumbs, Button, CircularProgress, Divider, FormControl, Typography} from "@mui/material";
+import {
+  Accordion, AccordionDetails, AccordionSummary,
+  Backdrop,
+  Breadcrumbs,
+  Button,
+  CircularProgress,
+  Divider,
+  FormControl,
+  Typography
+} from "@mui/material";
 import Container from "../components/container/Container";
 import {Card} from "../components/Card";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {EnvironmentForm} from "../components/forms/EnvironmentForm";
-import {useQuery} from "react-query";
+import {useMutation, useQuery} from "react-query";
 import FeatureFlagsDatagrid from "../components/datagrid/FeatureFlagsDatagrid";
-import {useContext} from "react";
+import {useContext, useState} from "react";
 import {AlertContextType} from "../@types/alert";
 import {AlertContext} from "../AlertProvider";
-import {deleteEnvironment, getEnvironment} from "../services/environments_api";
+import {deleteEnvironment, getEnvironment, setEnvironmentFlag} from "../services/environments_api";
+import {ExpandMore} from "@mui/icons-material";
+import {FeatureFlagForm} from "../components/forms/FeatureFlagForm";
+import {queryClient} from "../main";
+import FeatureFlag from "../models/FeatureFlag";
 
 export default function EnvironmentPage() {
   let { id } = useParams();
   const { isLoading, error, data } = useQuery('environmentData', () => getEnvironment(id))
   const navigate = useNavigate();
   const {setAlert} = useContext<AlertContextType>(AlertContext);
+  const [currentFlag, setCurrentFlag] = useState(null);
 
   function handleSave() {
 
+  }
+
+  // @ts-ignore
+  const mutation = useMutation(setEnvironmentFlag, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('environmentData')
+      setAlert({
+        title: "Success",
+        message: "Feature flag updated successfully",
+        severity: "success",
+      })
+      setCurrentFlag(null)
+    },
+  })
+
+  function setFlag(featureFlag: FeatureFlag) {
+    if (id) { // @ts-ignore
+      mutation.mutate({
+        envId: id,
+        // @ts-ignore
+        flag: featureFlag
+      })
+    }
   }
 
   async function handleDelete() {
@@ -79,7 +116,30 @@ export default function EnvironmentPage() {
             }}>Add flag</Button>
           </FormControl>
           <Divider sx={{mb: 0, mt: 2}}/>
-          <FeatureFlagsDatagrid flags={data.flags || []} />
+          {
+            data.flags ? data.flags.map((flag, index) => (
+              <Accordion expanded={currentFlag === index} onChange={() => {}}>
+                 <AccordionSummary
+                   expandIcon={<ExpandMore />}
+                   onClick={() => {
+                     setCurrentFlag(currentFlag !== index ? index : null)
+                   }}
+                 >
+                   <Typography sx={{ width: '33%', flexShrink: 0 }}>
+                     {flag.name}
+                   </Typography>
+                   <Typography sx={{ color: 'text.secondary' }}>
+                     {flag.label}
+                   </Typography>
+                 </AccordionSummary>
+                 <AccordionDetails>
+                   <FeatureFlagForm featureFlag={flag} onSave={setFlag} />
+                 </AccordionDetails>
+               </Accordion>
+            )) : (
+              <Typography>No flags</Typography>
+            )
+          }
         </Card>
       </Container>
     </>

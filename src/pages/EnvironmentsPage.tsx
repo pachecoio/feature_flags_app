@@ -83,8 +83,8 @@ export default function EnvironmentsPage() {
     </Container>
       <Fab sx={{
         position: "fixed",
-        bottom: 16,
-        right: 16,
+        bottom: 50,
+        right: 50,
       }} color="primary" onClick={addEnv}>
         <Add />
       </Fab>

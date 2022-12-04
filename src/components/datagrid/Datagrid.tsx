@@ -66,6 +66,8 @@ export function CellText(value: any) {
     let v = value;
     if (value instanceof Date) {
       v = value.toLocaleString()
+    } else if(typeof value === "boolean") {
+      v = value ? "Yes" : "No"
     }
     return (
       <Typography>{v}</Typography>
