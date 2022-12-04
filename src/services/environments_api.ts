@@ -39,5 +39,17 @@ export const setEnvironmentFlag = async ({envId, flag}: EnvironmentFlagRequest) 
   return res.json()
 }
 
+type DeleteEnvironmentFlagRequest = {
+  envId: string,
+  flagName: string
+}
+
+export const deleteEnvironmentFlag = async ({envId, flagName}: DeleteEnvironmentFlagRequest) => {
+  const res = await fetch(`http://localhost:8080/environments/${envId}/flags/${flagName}`, {
+    method: 'DELETE',
+  })
+  return res.json()
+}
+
 export const getEnvironment = (id: string | undefined) => fetch(`http://localhost:8080/environments/${id}`).then(res => res.json())
 

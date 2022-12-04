@@ -24,7 +24,7 @@ export default function AddFeatureFlagPage() {
         message: "Feature flag created successfully",
         severity: "success",
       })
-      navigate("/");
+      navigate(-1);
     },
   })
 

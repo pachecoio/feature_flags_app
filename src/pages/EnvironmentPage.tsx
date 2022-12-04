@@ -3,7 +3,7 @@ import {
   Backdrop,
   Breadcrumbs,
   Button,
-  CircularProgress,
+  CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
   Divider,
   FormControl,
   Typography
@@ -17,18 +17,25 @@ import FeatureFlagsDatagrid from "../components/datagrid/FeatureFlagsDatagrid";
 import {useContext, useState} from "react";
 import {AlertContextType} from "../@types/alert";
 import {AlertContext} from "../AlertProvider";
-import {deleteEnvironment, getEnvironment, setEnvironmentFlag} from "../services/environments_api";
-import {ExpandMore} from "@mui/icons-material";
+import {
+  deleteEnvironment,
+  deleteEnvironmentFlag,
+  getEnvironment,
+  setEnvironmentFlag
+} from "../services/environments_api";
+import {Create, DeleteForever, ExpandMore} from "@mui/icons-material";
 import {FeatureFlagForm} from "../components/forms/FeatureFlagForm";
 import {queryClient} from "../main";
 import FeatureFlag from "../models/FeatureFlag";
 
 export default function EnvironmentPage() {
   let { id } = useParams();
-  const { isLoading, error, data } = useQuery('environmentData', () => getEnvironment(id))
+  const { isLoading, error, data, refetch } = useQuery('environmentData', () => getEnvironment(id))
   const navigate = useNavigate();
   const {setAlert} = useContext<AlertContextType>(AlertContext);
   const [currentFlag, setCurrentFlag] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [flagToDelete, setFlagToDelete] = useState(null);
 
   function handleSave() {
 
@@ -71,6 +78,41 @@ export default function EnvironmentPage() {
     }
   }
 
+  function handleOpenDialog() {
+    setOpen(true)
+  }
+
+  function handleCloseDialog() {
+    setOpen(false)
+  }
+
+  async function handleDeleteFlag() {
+    if(!id) return
+    try {
+      await deleteEnvironmentFlag({
+        envId: id,
+        // @ts-ignore
+        flagName: flagToDelete
+      });
+    } finally {
+      setAlert({
+        title: "Success",
+        message: "Environment flag deleted successfully",
+        severity: "success",
+      })
+      refetch()
+      setFlagToDelete(null)
+    }
+  }
+
+  function handleOpenFlagDialog(flagName: string) {
+    // @ts-ignore
+    setFlagToDelete(flagName)
+  }
+  function handleCloseFlagDialog() {
+    setFlagToDelete(null)
+  }
+
   if (isLoading) return (
     <Backdrop
       sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -99,7 +141,7 @@ export default function EnvironmentPage() {
             <Typography variant="h6">
               Environment {data.name}
             </Typography>
-            <Button variant="outlined" color="error" onClick={handleDelete}>Delete</Button>
+            <Button variant="outlined" color="error" onClick={handleOpenDialog}>Delete</Button>
           </FormControl>
           <Divider sx={{
             mb: 4
@@ -117,10 +159,11 @@ export default function EnvironmentPage() {
           </FormControl>
           <Divider sx={{mb: 0, mt: 2}}/>
           {
+            // @ts-ignore
             data.flags ? data.flags.map((flag, index) => (
-              <Accordion expanded={currentFlag === index} onChange={() => {}}>
+              <Accordion key={flag.name} expanded={currentFlag === index} onChange={() => {}}>
                  <AccordionSummary
-                   expandIcon={<ExpandMore />}
+                   expandIcon={<Create />}
                    onClick={() => {
                      setCurrentFlag(currentFlag !== index ? index : null)
                    }}
@@ -128,9 +171,12 @@ export default function EnvironmentPage() {
                    <Typography sx={{ width: '33%', flexShrink: 0 }}>
                      {flag.name}
                    </Typography>
-                   <Typography sx={{ color: 'text.secondary' }}>
+                   <Typography sx={{ color: 'text.secondary', flex: 1 }}>
                      {flag.label}
                    </Typography>
+                   <Button color="error" sx={{mr: 4}} onClick={() => handleOpenFlagDialog(flag.name)}>
+                     <DeleteForever />
+                   </Button>
                  </AccordionSummary>
                  <AccordionDetails>
                    <FeatureFlagForm featureFlag={flag} onSave={setFlag} />
@@ -141,6 +187,49 @@ export default function EnvironmentPage() {
             )
           }
         </Card>
+        {/*Delete environment dialog*/}
+        <Dialog
+          open={open}
+          onClose={handleCloseDialog}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"Delete environment?"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              This action cannot be undone
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Cancel</Button>
+            <Button onClick={handleDelete} autoFocus>
+              Delete forever
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/*Delete environment flag dialog*/}
+        <Dialog
+          open={!!flagToDelete}
+          onClose={handleCloseFlagDialog}
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"Delete environment flag?"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              This action cannot be undone
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseFlagDialog}>Cancel</Button>
+            <Button onClick={handleDeleteFlag} autoFocus>
+              Delete forever
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Container>
     </>
   )

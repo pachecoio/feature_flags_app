@@ -9,6 +9,7 @@ import AddEnvironmentPage from "./pages/AddEnvironment";
 import {AlertProvider} from "./AlertProvider";
 import EnvironmentPage from "./pages/EnvironmentPage";
 import AddEnvironmentFeatureFlagPage from "./pages/AddEnvironmentFeatureFlagPage";
+import SupportPage from "./pages/SupportPage";
 
 const darkTheme = createTheme({
   palette: {
@@ -31,6 +32,7 @@ function App() {
             <Route path={"/environments/:id/flags/add"} element={<AddEnvironmentFeatureFlagPage />} />
             <Route path={"/environments/:id"} element={<EnvironmentPage />} />
             <Route path={"/environments/add"} element={<AddEnvironmentPage />} />
+            <Route path={"/support"} element={<SupportPage />} />
           </Routes>
         </Layout>
       </BrowserRouter>

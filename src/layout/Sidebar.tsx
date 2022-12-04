@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import {Box, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
-import {Drafts, Flag, Inbox, Pages} from '@mui/icons-material';
+import {Drafts, Flag, Inbox, Pages, Support} from '@mui/icons-material';
 import {useNavigate} from "react-router-dom";
 
 const Aside = styled.aside`
@@ -37,6 +37,14 @@ export default function Sidebar() {
                 <Pages />
               </ListItemIcon>
               <ListItemText primary="Environments" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton onClick={navigate('/support')}>
+              <ListItemIcon>
+                <Support />
+              </ListItemIcon>
+              <ListItemText primary="Support" />
             </ListItemButton>
           </ListItem>
         </List>

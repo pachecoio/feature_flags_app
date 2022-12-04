@@ -15,7 +15,7 @@ export default function AddEnvironmentPage() {
   const mutation = useMutation(createEnvironment, {
     onSuccess: () => {
       queryClient.invalidateQueries('environmentsData')
-      navigate("/environments");
+      navigate(-1);
     },
   })
 
