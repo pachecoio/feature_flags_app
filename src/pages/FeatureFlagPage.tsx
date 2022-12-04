@@ -1,6 +1,7 @@
 import Container from "../components/container/Container";
 import {
-  Breadcrumbs,
+  Backdrop,
+  Breadcrumbs, Button, CircularProgress,
   Divider,
   Link,
   Typography
@@ -10,16 +11,18 @@ import {Card} from "../components/Card";
 import {FeatureFlagForm} from "../components/forms/FeatureFlagForm";
 import {useMutation, useQuery} from "react-query";
 import {useNavigate, useParams} from "react-router-dom";
-import {useEffect} from "react";
+import {useContext, useEffect} from "react";
 import {queryClient} from "../main";
-import {getFlag, updateFlag} from "../services/feature_flags_api";
-
+import {deleteFlag, getFlag, updateFlag} from "../services/feature_flags_api";
+import {AlertContextType} from "../@types/alert";
+import {AlertContext} from "../AlertProvider";
 
 export default function FeatureFlagPage() {
   let { id } = useParams();
   // @ts-ignore
-  const { isLoading, error, data } = useQuery('fetch_flag', () => getFlag(id))
+  const { isLoading, error, data, status } = useQuery('fetch_flag', () => getFlag(id))
   const navigate = useNavigate();
+  const {setAlert} = useContext<AlertContextType>(AlertContext);
 
   useEffect(() => {
     return () => {
@@ -45,20 +48,37 @@ export default function FeatureFlagPage() {
     mutation.mutate(featureFlag)
   }
 
+  async function handleDelete() {
+    if(!id) return
+    try {
+      await deleteFlag(id);
+    } finally {
+      navigate("/")
+      setAlert({
+        title: "Success",
+        message: "Feature flag deleted successfully",
+        severity: "success",
+      })
+    }
+  }
+
   if (isLoading) return (
-    <Container>
-      <Typography>Loading...</Typography>
-    </Container>
+    <Backdrop
+      sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      open={true}
+      >
+      <CircularProgress color="inherit" />
+    </Backdrop>
   )
 
-  if (error) return (
+  if (status === 'error') return (
     <Container>
       {/*@ts-ignore*/}
       <Typography>Error: {error.message}</Typography>
     </Container>
   )
 
-  console.log('current flag', data)
+  if (data.error) navigate("/")
 
   return (
     <Container style={{marginTop: "1.5em", marginBottom: "1.5em"}}>
@@ -69,11 +89,14 @@ export default function FeatureFlagPage() {
         <Typography color="text.primary">{!!data.name ? data.name : "Add flag"}</Typography>
       </Breadcrumbs>
       <Card>
-        <Typography variant="h6" sx={{
-          mb: 1
-        }}>
-          {!!data.name ? "Edit feature flag " + data.name : "Add feature flag"}
-        </Typography>
+        <div>
+          <Typography variant="h6" sx={{
+            mb: 1
+          }}>
+            {!!data.name ? "Edit feature flag " + data.name : "Add feature flag"}
+          </Typography>
+          <Button variant="outlined" color="error" onClick={handleDelete}>Delete</Button>
+        </div>
         <Divider sx={{
           mb: 4
         }} />

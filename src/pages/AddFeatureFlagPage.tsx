@@ -7,13 +7,23 @@ import {useMutation} from "react-query";
 import {queryClient} from "../main";
 import {useNavigate} from "react-router-dom";
 import {createFlag} from "../services/feature_flags_api";
+import {useContext} from "react";
+import {AlertContextType} from "../@types/alert";
+import {AlertContext} from "../AlertProvider";
 
 export default function AddFeatureFlagPage() {
   const navigate = useNavigate();
+  // @ts-ignore
+  const {setAlert} = useContext<AlertContextType>(AlertContext);
 
   const mutation = useMutation(createFlag, {
     onSuccess: () => {
       queryClient.invalidateQueries('flagsData')
+      setAlert({
+        title: "Success",
+        message: "Feature flag created successfully",
+        severity: "success",
+      })
       navigate("/");
     },
   })

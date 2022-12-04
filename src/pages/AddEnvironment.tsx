@@ -1,7 +1,6 @@
 import {Breadcrumbs, Divider, Link, Typography} from "@mui/material";
 import Container from "../components/container/Container";
 import {Card} from "../components/Card";
-import {FeatureFlagForm} from "../components/forms/FeatureFlagForm";
 import {useMutation} from "react-query";
 import {queryClient} from "../main";
 import {useNavigate} from "react-router-dom";

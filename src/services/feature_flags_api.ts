@@ -31,3 +31,10 @@ export const createFlag = async (flag: FeatureFlag) => {
   })
   return res.json()
 }
+
+export const deleteFlag = async (id: string) => {
+  const res = await fetch(`http://localhost:8080/feature_flags/${id}`, {
+    method: 'DELETE',
+  })
+  return res.json()
+}

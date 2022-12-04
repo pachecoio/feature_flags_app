@@ -1,42 +1,22 @@
 import Container from "../components/container/Container";
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import styled from "styled-components";
 import Datagrid, {Cell} from "../components/datagrid/Datagrid";
-import {Breadcrumbs, Fab, TableRow, Typography} from "@mui/material";
+import {Alert, AlertTitle, Backdrop, Breadcrumbs, CircularProgress, Fab, TableRow, Typography} from "@mui/material";
 import FeatureFlag from "../models/FeatureFlag";
 import {Link, useNavigate} from "react-router-dom";
 import {Add} from "@mui/icons-material";
 import {useQuery} from "react-query";
 import {queryClient} from "../main";
-
-const initialFlags: FeatureFlag[] = [
-  new FeatureFlag(
-    "123",
-    "sample_flag",
-    "Sample Flag",
-  ),
-  new FeatureFlag(
-    "234",
-    "sample_flag_2",
-    "Sample Flag 2",
-  ),
-]
-
-const FlagList = styled.ul`
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-`
-
-const FlagListItem = styled.li`
-  display: flex;
-`
+import {AlertContext} from "../AlertProvider";
 
 export default function FeatureFlagsPage() {
   const navigate = useNavigate();
   const { isLoading, error, data } = useQuery('flagsData', () =>
       fetch('http://localhost:8080/feature_flags').then(res => res.json())
   )
+  // @ts-ignore
+  const {alert} = useContext(AlertContext);
 
   useEffect(() => {
     return () => {
@@ -78,9 +58,12 @@ export default function FeatureFlagsPage() {
   }
 
   if (isLoading) return (
-    <Container>
-      <Typography>Loading...</Typography>
-    </Container>
+    <Backdrop
+      sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      open={true}
+      >
+      <CircularProgress color="inherit" />
+    </Backdrop>
   )
 
   if (error) return (
@@ -89,6 +72,8 @@ export default function FeatureFlagsPage() {
       <Typography>Error: {error.message}</Typography>
     </Container>
   )
+
+  console.log('alert', alert)
 
   return (
     <>
@@ -126,6 +111,20 @@ export default function FeatureFlagsPage() {
       }} color="primary" aria-label="add" onClick={addFlag}>
         <Add />
       </Fab>
+      {
+        alert ?
+        <Alert
+          severity={alert.severity}
+          sx={{
+            position: "absolute",
+            top: 50,
+            right: 20,
+          }}
+        >
+          <AlertTitle>{alert.title}</AlertTitle>
+          {alert.message}
+        </Alert> : null
+      }
     </>
   )
 }
