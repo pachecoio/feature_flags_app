@@ -1,11 +1,11 @@
 import {
   Accordion, AccordionDetails, AccordionSummary,
-  Backdrop,
+  Backdrop, Box,
   Breadcrumbs,
   Button,
   CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
   Divider,
-  FormControl,
+  FormControl, Tab, Tabs,
   Typography
 } from "@mui/material";
 import Container from "../components/container/Container";
@@ -27,6 +27,8 @@ import {Create, DeleteForever, ExpandMore} from "@mui/icons-material";
 import {FeatureFlagForm} from "../components/forms/FeatureFlagForm";
 import {queryClient} from "../main";
 import FeatureFlag from "../models/FeatureFlag";
+import FeatureFlagSimulator from "../components/FeatureFlagSimulator";
+import TabPanel from "../components/TabPanel";
 
 export default function EnvironmentPage() {
   let { id } = useParams();
@@ -36,6 +38,7 @@ export default function EnvironmentPage() {
   const [currentFlag, setCurrentFlag] = useState(null);
   const [open, setOpen] = useState(false);
   const [flagToDelete, setFlagToDelete] = useState(null);
+  const [tab, setTab] = useState(0)
 
   function handleSave() {
 
@@ -85,6 +88,10 @@ export default function EnvironmentPage() {
   function handleCloseDialog() {
     setOpen(false)
   }
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTab(newValue);
+  };
 
   async function handleDeleteFlag() {
     if(!id) return
@@ -136,101 +143,111 @@ export default function EnvironmentPage() {
           </Link>
           <Typography color="text.primary">{data.name}</Typography>
         </Breadcrumbs>
-        <Card>
-          <FormControl sx={{display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', mb: 2}}>
-            <Typography variant="h6">
-              Environment {data.name}
-            </Typography>
-            <Button variant="outlined" color="error" onClick={handleOpenDialog}>Delete</Button>
-          </FormControl>
-          <Divider sx={{
-            mb: 4
-          }} />
-          <EnvironmentForm environment={data} onSave={handleSave} />
-        </Card>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs value={tab} onChange={handleTabChange}>
+            <Tab label="Details" id={`flag_tabs_0}`} />
+            <Tab label="Simulation" id={`flag_tabs_1}`} />
+          </Tabs>
+        </Box>
+        <TabPanel value={tab} index={0}>
+          <Container>
+            <Card>
+              <FormControl sx={{display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', mb: 2}}>
+                <Typography variant="h6">
+                  Environment {data.name}
+                </Typography>
+                <Button variant="outlined" color="error" onClick={handleOpenDialog}>Delete</Button>
+              </FormControl>
+              <Divider sx={{
+                mb: 4
+              }} />
+              <EnvironmentForm environment={data} onSave={handleSave} />
+            </Card>
+            <Card sx={{mt: 2}}>
+              <FormControl sx={{display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'}}>
+                <Typography>Environment flags</Typography>
+                <Button variant="outlined" color="success" onClick={() => {
+                  navigate(`/environments/${id}/flags/add`)
+                }}>Add flag</Button>
+              </FormControl>
+              <Divider sx={{mb: 0, mt: 2}}/>
+              {
+                // @ts-ignore
+                data.flags ? data.flags.map((flag, index) => (
+                  <Accordion key={flag.name} expanded={currentFlag === index} onChange={() => {}}>
+                     <AccordionSummary
+                       expandIcon={<Create />}
+                       onClick={() => {
+                         setCurrentFlag(currentFlag !== index ? index : null)
+                       }}
+                     >
+                       <Typography sx={{ width: '33%', flexShrink: 0 }}>
+                         {flag.name}
+                       </Typography>
+                       <Typography sx={{ color: 'text.secondary', flex: 1 }}>
+                         {flag.label}
+                       </Typography>
+                       <Button color="error" sx={{mr: 4}} onClick={() => handleOpenFlagDialog(flag.name)}>
+                         <DeleteForever />
+                       </Button>
+                     </AccordionSummary>
+                     <AccordionDetails>
+                       <FeatureFlagForm featureFlag={flag} onSave={setFlag} />
+                     </AccordionDetails>
+                   </Accordion>
+                )) : (
+                  <Typography>No flags</Typography>
+                )
+              }
+            </Card>
+          </Container>
+        </TabPanel>
+        <TabPanel value={tab} index={1}>
+          <FeatureFlagSimulator environment={data} />
+        </TabPanel>
       </Container>
-      <Container style={{marginTop: "1.5em", marginBottom: "1.5em"}}>
-        <Card>
-          <FormControl sx={{display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Typography>Environment flags</Typography>
-            <Button variant="outlined" color="success" onClick={() => {
-              navigate(`/environments/${id}/flags/add`)
-            }}>Add flag</Button>
-          </FormControl>
-          <Divider sx={{mb: 0, mt: 2}}/>
-          {
-            // @ts-ignore
-            data.flags ? data.flags.map((flag, index) => (
-              <Accordion key={flag.name} expanded={currentFlag === index} onChange={() => {}}>
-                 <AccordionSummary
-                   expandIcon={<Create />}
-                   onClick={() => {
-                     setCurrentFlag(currentFlag !== index ? index : null)
-                   }}
-                 >
-                   <Typography sx={{ width: '33%', flexShrink: 0 }}>
-                     {flag.name}
-                   </Typography>
-                   <Typography sx={{ color: 'text.secondary', flex: 1 }}>
-                     {flag.label}
-                   </Typography>
-                   <Button color="error" sx={{mr: 4}} onClick={() => handleOpenFlagDialog(flag.name)}>
-                     <DeleteForever />
-                   </Button>
-                 </AccordionSummary>
-                 <AccordionDetails>
-                   <FeatureFlagForm featureFlag={flag} onSave={setFlag} />
-                 </AccordionDetails>
-               </Accordion>
-            )) : (
-              <Typography>No flags</Typography>
-            )
-          }
-        </Card>
-        {/*Delete environment dialog*/}
-        <Dialog
-          open={open}
-          onClose={handleCloseDialog}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">
-            {"Delete environment?"}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              This action cannot be undone
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>Cancel</Button>
-            <Button onClick={handleDelete} autoFocus>
-              Delete forever
-            </Button>
-          </DialogActions>
-        </Dialog>
+      <Dialog
+        open={open}
+        onClose={handleCloseDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Delete environment?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            This action cannot be undone
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button onClick={handleDelete} autoFocus>
+            Delete forever
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-        {/*Delete environment flag dialog*/}
-        <Dialog
-          open={!!flagToDelete}
-          onClose={handleCloseFlagDialog}
-        >
-          <DialogTitle id="alert-dialog-title">
-            {"Delete environment flag?"}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              This action cannot be undone
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseFlagDialog}>Cancel</Button>
-            <Button onClick={handleDeleteFlag} autoFocus>
-              Delete forever
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Container>
+      {/*Delete environment flag dialog*/}
+      <Dialog
+        open={!!flagToDelete}
+        onClose={handleCloseFlagDialog}
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Delete environment flag?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            This action cannot be undone
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseFlagDialog}>Cancel</Button>
+          <Button onClick={handleDeleteFlag} autoFocus>
+            Delete forever
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }

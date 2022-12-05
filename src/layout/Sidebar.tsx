@@ -39,14 +39,6 @@ export default function Sidebar() {
               <ListItemText primary="Environments" />
             </ListItemButton>
           </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton onClick={navigate('/support')}>
-              <ListItemIcon>
-                <Support />
-              </ListItemIcon>
-              <ListItemText primary="Support" />
-            </ListItemButton>
-          </ListItem>
         </List>
       </nav>
       <Divider />

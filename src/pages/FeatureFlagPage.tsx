@@ -1,8 +1,8 @@
 import Container from "../components/container/Container";
 import {
-  Backdrop,
+  Backdrop, Box,
   Breadcrumbs, Button, CircularProgress,
-  Divider, FormControl,
+  Divider, FormControl, Tab, Tabs, TextareaAutosize,
   Typography
 } from "@mui/material";
 import FeatureFlag from "../models/FeatureFlag";
@@ -10,11 +10,12 @@ import {Card} from "../components/Card";
 import {FeatureFlagForm} from "../components/forms/FeatureFlagForm";
 import {useMutation, useQuery} from "react-query";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import {useContext, useEffect} from "react";
+import {useContext, useEffect, useState} from "react";
 import {queryClient} from "../main";
 import {deleteFlag, getFlag, updateFlag} from "../services/feature_flags_api";
 import {AlertContextType} from "../@types/alert";
 import {AlertContext} from "../AlertProvider";
+import FeatureFlagSimulator from "../components/FeatureFlagSimulator";
 
 export default function FeatureFlagPage() {
   let { id } = useParams();
@@ -88,15 +89,15 @@ export default function FeatureFlagPage() {
         <Typography color="text.primary">{!!data.name ? data.name : "Add flag"}</Typography>
       </Breadcrumbs>
       <Card>
-          <FormControl sx={{display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', mb: 1}}>
-            <Typography variant="h6">
-              {!!data.name ? "Edit feature flag " + data.name : "Add feature flag"}
-            </Typography>
-            <Button variant="outlined" color="error" onClick={handleDelete}>Delete</Button>
-          </FormControl>
+        <FormControl sx={{display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', mb: 1}}>
+          <Typography>
+            {!!data.name ? "Edit feature flag " + data.name : "Add feature flag"}
+          </Typography>
+          <Button variant="outlined" color="error" onClick={handleDelete}>Delete</Button>
+        </FormControl>
         <Divider sx={{
-          mb: 4
-        }} />
+            mb: 4
+          }} />
         <FeatureFlagForm featureFlag={data} onSave={handleSave} />
       </Card>
     </Container>

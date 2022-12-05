@@ -3,7 +3,7 @@ import FeatureFlag from "../models/FeatureFlag";
 export const updateFlag = async (flag: FeatureFlag) => {
   const body = JSON.stringify(flag);
   // @ts-ignore
-  const res = await fetch(`http://localhost:8080/feature_flags/${flag._id.$oid}`, {
+  const res = await fetch(`http://localhost:8080/admin/feature_flags/${flag._id.$oid}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -15,14 +15,14 @@ export const updateFlag = async (flag: FeatureFlag) => {
 }
 
 export const getFlag = (id: string) => {
-  return fetch(`http://localhost:8080/feature_flags/${id}`).then(res => res.json())
+  return fetch(`http://localhost:8080/admin/feature_flags/${id}`).then(res => res.json())
 }
 
 
 export const createFlag = async (flag: FeatureFlag) => {
   const body = JSON.stringify(flag);
   console.log('post flag', flag)
-  const res = await fetch('http://localhost:8080/feature_flags', {
+  const res = await fetch('http://localhost:8080/admin/feature_flags', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -33,10 +33,21 @@ export const createFlag = async (flag: FeatureFlag) => {
 }
 
 export const deleteFlag = async (id: string) => {
-  const res = await fetch(`http://localhost:8080/feature_flags/${id}`, {
+  const res = await fetch(`http://localhost:8080/admin/feature_flags/${id}`, {
     method: 'DELETE',
   })
   return res.json()
 }
 
-export const getFlags = () => fetch('http://localhost:8080/feature_flags').then(res => res.json())
+export const getFlags = () => fetch('http://localhost:8080/admin/feature_flags').then(res => res.json())
+
+export const getFlagsFromContext = async (context: any) => {
+  const res = await fetch("http://localhost:8080/flags", {
+    method: "POST",
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({context}),
+  })
+  return res.json()
+}

@@ -7,6 +7,7 @@ import {Add} from "@mui/icons-material";
 import Environment from "../models/Environment";
 import {useQuery} from "react-query";
 import {queryClient} from "../main";
+import {getEnvironments} from "../services/environments_api";
 
 export default function EnvironmentsPage() {
   const navigate = useNavigate();
@@ -18,9 +19,7 @@ export default function EnvironmentsPage() {
     },
   ]
 
-  const { isLoading, error, data } = useQuery('environmentsData', () =>
-      fetch('http://localhost:8080/environments').then(res => res.json())
-  )
+  const { isLoading, error, data } = useQuery('environmentsData', getEnvironments)
 
   useEffect(() => {
     return () => {
