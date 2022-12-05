@@ -1,9 +1,10 @@
 import Environment from "../models/Environment";
 import FeatureFlag from "../models/FeatureFlag";
+import {getApiUrl} from "./config";
 
 export const createEnvironment = async (env: Environment) => {
   const body = JSON.stringify(env);
-  const res = await fetch('http://localhost:8080/admin/environments', {
+  const res = await fetch(`${getApiUrl()}/admin/environments`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -14,7 +15,7 @@ export const createEnvironment = async (env: Environment) => {
 }
 
 export const deleteEnvironment = async (id: string) => {
-  const res = await fetch(`http://localhost:8080/admin/environments/${id}`, {
+  const res = await fetch(`${getApiUrl()}/admin/environments/${id}`, {
     method: 'DELETE',
   })
   return res.json()
@@ -27,7 +28,7 @@ type EnvironmentFlagRequest = {
 
 export const setEnvironmentFlag = async ({envId, flag}: EnvironmentFlagRequest) => {
   const body = JSON.stringify(flag);
-  const res = await fetch(`http://localhost:8080/admin/environments/${envId}/flags`, {
+  const res = await fetch(`${getApiUrl()}/admin/environments/${envId}/flags`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -43,18 +44,18 @@ type DeleteEnvironmentFlagRequest = {
 }
 
 export const deleteEnvironmentFlag = async ({envId, flagName}: DeleteEnvironmentFlagRequest) => {
-  const res = await fetch(`http://localhost:8080/admin/environments/${envId}/flags/${flagName}`, {
+  const res = await fetch(`${getApiUrl()}/admin/environments/${envId}/flags/${flagName}`, {
     method: 'DELETE',
   })
   return res.json()
 }
 
-export const getEnvironment = (id: string | undefined) => fetch(`http://localhost:8080/admin/environments/${id}`).then(res => res.json())
+export const getEnvironment = (id: string | undefined) => fetch(`${getApiUrl()}/admin/environments/${id}`).then(res => res.json())
 
-export const getEnvironments = () => fetch('http://localhost:8080/admin/environments').then(res => res.json())
+export const getEnvironments = () => fetch(`${getApiUrl()}/admin/environments`).then(res => res.json())
 
 export const getEnvironmentFlagsFromContext = async (environmentName: string, context: any) => {
-  const res = await fetch(`http://localhost:8080/flags/${environmentName}`, {
+  const res = await fetch(`${getApiUrl()}/flags/${environmentName}`, {
     method: "POST",
     headers: {
       'Content-Type': 'application/json',
