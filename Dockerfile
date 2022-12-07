@@ -2,7 +2,7 @@
 FROM node as build
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
-ENV VITE_API_URL=http://backend:8080
+ENV VITE_API_URL=http://localhost
 COPY package.json ./
 COPY package-lock.json ./
 RUN npm install
