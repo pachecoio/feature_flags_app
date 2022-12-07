@@ -13,7 +13,6 @@ import {Card} from "../components/Card";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {EnvironmentForm} from "../components/forms/EnvironmentForm";
 import {useMutation, useQuery} from "react-query";
-import FeatureFlagsDatagrid from "../components/datagrid/FeatureFlagsDatagrid";
 import {useContext, useState} from "react";
 import {AlertContextType} from "../@types/alert";
 import {AlertContext} from "../AlertProvider";
@@ -168,7 +167,7 @@ export default function EnvironmentPage() {
                 <Typography>Environment flags</Typography>
                 <Button variant="outlined" color="success" onClick={() => {
                   navigate(`/environments/${id}/flags/add`)
-                }}>Add flag</Button>
+                }}>Override flag</Button>
               </FormControl>
               <Divider sx={{mb: 0, mt: 2}}/>
               {

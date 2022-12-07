@@ -8,7 +8,7 @@ import {
   Typography
 } from "@mui/material";
 import Container from "../components/container/Container";
-import FeatureFlag, {Rule} from "../models/FeatureFlag";
+import FeatureFlag from "../models/FeatureFlag";
 import {Card} from "../components/Card";
 import {FeatureFlagForm} from "../components/forms/FeatureFlagForm";
 import {useMutation, useQuery} from "react-query";
@@ -82,7 +82,7 @@ export default function AddEnvironmentFeatureFlagPage() {
           <Link color="inherit" to={`/environments/${id}`}>
             {data.name}
           </Link>
-          <Typography color="text.primary">{"Add flag"}</Typography>
+          <Typography color="text.primary">{"Override flag"}</Typography>
         </Breadcrumbs>
         {
           flagsData.data.items.length ? (
@@ -132,7 +132,7 @@ export default function AddEnvironmentFeatureFlagPage() {
               <Typography variant="h6" sx={{
                 mb: 1
               }}>
-                Add feature flag
+                Override feature flag
               </Typography>
               <Divider sx={{
                 mb: 4
